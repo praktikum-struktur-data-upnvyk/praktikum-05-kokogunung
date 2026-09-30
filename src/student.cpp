@@ -184,12 +184,18 @@
 // =============================================================================
 
 #include "student.h"
-
+#include <conio.h>
 #include <iomanip>
 #include <iostream>
 #include <string>
 
 using namespace std;
+
+struct KNode{
+    char symbol;
+    KNode* next;
+};
+
 
 // =============================================================================
 // SOAL 1 — push                                                        25 poin
@@ -238,7 +244,11 @@ using namespace std;
 // =============================================================================
 
 bool push(Stack& s, int nilai) {
-    return false;
+    Node* new_node = new Node;
+    new_node->data = nilai;
+    new_node->next = s.top;
+    s.top = new_node;
+    return true;
 }
 
 // =============================================================================
@@ -300,7 +310,15 @@ bool push(Stack& s, int nilai) {
 // =============================================================================
 
 bool pop(Stack& s, int& nilai) {
-    return false;
+    Node* del_nd;
+    if(s.top == nullptr){
+        return false;
+    }
+    del_nd = s.top;
+    s.top = s.top->next;
+    nilai = del_nd->data;
+    delete del_nd;
+    return true;
 }
 
 // =============================================================================
@@ -347,6 +365,18 @@ bool pop(Stack& s, int& nilai) {
 // =============================================================================
 
 void clear(Stack& s) {
+    Node* del_nd;
+    if(s.top == nullptr){
+        return;
+    }
+    while(s.top->next != nullptr){
+        del_nd = s.top;
+        s.top = s.top->next;
+        delete del_nd;   
+    }
+    del_nd = s.top;
+    s.top = s.top->next;
+    delete del_nd;
 }
 
 // =============================================================================
@@ -408,9 +438,69 @@ void clear(Stack& s) {
 //     memakai stack sendiri, jangan lupa membereskan node-nya sebelum fungsi
 //     ini selesai.
 // =============================================================================
+void pop_KNode(KNode* &top){
+    if(top ==  nullptr){
+        return;
+    }
+    KNode* del_knd = top;
+    top = top->next;
+    delete del_knd;
+}
+
+void push_KNode(KNode* &top, char symbol){
+    KNode* new_knd = new KNode;
+    new_knd->symbol = symbol;
+    new_knd->next = top;
+    top = new_knd;
+}
+
+void clear_KNode(KNode* &top){
+    KNode* del_knd;
+    if(top == nullptr){
+        return;
+    }
+    while(top->next != nullptr){
+        del_knd = top;
+        top = top->next;
+        delete del_knd;
+    }
+    del_knd = top;
+    top = top->next;
+    delete del_knd;
+}
 
 bool kurungSeimbang(const string& ekspresi) {
-    return false;
+    KNode* top = nullptr;
+    int len = ekspresi.length();
+    bool seimbang = true;
+    for(int i = 0; i < len; i++){
+        if(ekspresi[i] == '(' || ekspresi[i] == '[' || ekspresi[i] == '{'){
+            push_KNode(top, ekspresi[i]);
+            continue;
+        }
+        if(ekspresi[i] == ')' || ekspresi[i] == ']' || ekspresi[i] == '}'){
+            if(top == nullptr){
+                seimbang = false;
+                break;
+            }
+            if(ekspresi[i] == ')' && top->symbol != '('){
+                seimbang = false;
+                break;
+            }else if(ekspresi[i] == ']' && top->symbol != '['){
+                seimbang = false;
+                break;
+            }else if(ekspresi[i] == '}' && top->symbol != '{'){
+                seimbang = false;
+                break;
+            }
+            pop_KNode(top);
+        }
+    }
+    if(top != nullptr){
+        seimbang = false;
+        clear_KNode(top);
+    }
+    return seimbang;
 }
 
 // =============================================================================
@@ -565,9 +655,10 @@ int main() {
         "",                        // seimbang, tidak ada kurung
         "( a + b ) * ( c - d",     // kurang tutup
         "( a + [ b ) ]",           // bersilangan
-        ")("                       // tutup muncul lebih dulu
+        ")(",
+        "((((((((((()))))))))))"                       // tutup muncul lebih dulu
     };
-    for (int i = 0; i < 6; ++i) {
+    for (int i = 0; i < 7; ++i) {
         cout << "    \"" << contoh[i] << "\"";
         for (size_t j = contoh[i].size(); j < 24; ++j) cout << " ";
         cout << " -> " << benarSalah(kurungSeimbang(contoh[i])) << "\n";
@@ -589,7 +680,7 @@ int main() {
     cout << " Sesi selesai. Silakan ubah bagian ini untuk\n";
     cout << " mencoba percobaan Anda sendiri.\n";
     cout << "==================================================\n";
-
+    getche();
     return 0;
 }
 #endif

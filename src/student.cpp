@@ -184,7 +184,6 @@
 // =============================================================================
 
 #include "student.h"
-#include <conio.h>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -680,7 +679,6 @@ int main() {
     cout << " Sesi selesai. Silakan ubah bagian ini untuk\n";
     cout << " mencoba percobaan Anda sendiri.\n";
     cout << "==================================================\n";
-    getche();
     return 0;
 }
 #endif
